@@ -1,0 +1,807 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="Aprende matemáticas de quinto grado del MEP de Costa Rica con Matemática Divertida. Juegos interactivos, retos, y recursos educativos para estudiantes de primaria.">
+    <title>Matemática Divertida - 5.° Grado MEP</title>
+    <!-- Google Fonts: Poppins (Títulos) e Inter (Texto) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <!-- FontAwesome para Iconos -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Hojas de estilo -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+
+    <!-- Canvas para el Efecto de Confeti -->
+    <canvas id="confetti-canvas"></canvas>
+
+    <!-- Barra de Navegación Fija -->
+    <header class="navbar">
+        <div class="navbar-container">
+            <a href="#" class="logo">
+                <i class="fa-solid fa-graduation-cap logo-icon"></i>
+                <span class="logo-text">Matemática<span>Divertida</span></span>
+            </a>
+
+            <nav class="nav-menu" id="nav-menu">
+                <a href="#inicio" class="nav-link active"><i class="fa-solid fa-house"></i> Inicio</a>
+                <a href="#actividades" class="nav-link"><i class="fa-solid fa-gamepad"></i> Actividades</a>
+                <a href="#bitacora" class="nav-link"><i class="fa-solid fa-calendar-days"></i> Agenda</a>
+                <a href="#acerca" class="nav-link"><i class="fa-solid fa-circle-info"></i> Acerca del Proyecto</a>
+            </nav>
+
+            <div class="nav-buttons">
+                <!-- Botón móvil para mostrar/ocultar menú -->
+                <button class="menu-toggle" id="menu-toggle" aria-label="Abrir menú">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+                <!-- Botón para alternar el panel de progreso en pantallas móviles -->
+                <button class="progress-toggle" id="progress-toggle" aria-label="Ver progreso">
+                    <i class="fa-solid fa-trophy"></i>
+                    <span class="progress-badge-count" id="mobile-progress-badge">0</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Panel de Progreso (Sticky Widget en Escritorio, Drawer Lateral en Móvil) -->
+    <aside class="progress-panel" id="progress-panel">
+        <div class="progress-panel-header">
+            <h3>Mi Progreso</h3>
+            <button class="close-progress" id="close-progress" aria-label="Cerrar progreso">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+        <div class="progress-panel-body">
+            <div class="stat-progress-item">
+                <div class="stat-progress-icon"><i class="fa-solid fa-bullseye"></i></div>
+                <div class="stat-progress-info">
+                    <span class="stat-label">Actividades</span>
+                    <span class="stat-value" id="prog-completed">0 / 8</span>
+                </div>
+            </div>
+            <div class="stat-progress-item">
+                <div class="stat-progress-icon"><i class="fa-solid fa-star text-warning"></i></div>
+                <div class="stat-progress-info">
+                    <span class="stat-label">Puntos Totales</span>
+                    <span class="stat-value" id="prog-points">0 pts</span>
+                </div>
+            </div>
+            <div class="progress-bar-container">
+                <div class="progress-bar-header">
+                    <span>Avance General</span>
+                    <span id="prog-percent">0%</span>
+                </div>
+                <div class="progress-bar-track">
+                    <div class="progress-bar-fill" id="prog-fill" style="width: 0%;"></div>
+                </div>
+            </div>
+
+            <div class="badges-container">
+                <h4>Insignias Ganadas</h4>
+                <div class="badges-grid" id="badges-grid">
+                    <div class="badge-item locked" data-badge="1" title="Operaciones: Domina los números naturales">
+                        <i class="fa-solid fa-calculator"></i>
+                        <span>Números</span>
+                    </div>
+                    <div class="badge-item locked" data-badge="2"
+                        title="Multi-Div: Experto en multiplicación y división">
+                        <i class="fa-solid fa-xmark"></i>
+                        <span>Cálculo</span>
+                    </div>
+                    <div class="badge-item locked" data-badge="3" title="Fracciones: Maestro de las partes enteras">
+                        <i class="fa-solid fa-pizza-slice"></i>
+                        <span>Fracciones</span>
+                    </div>
+                    <div class="badge-item locked" data-badge="4" title="Geometría: Conquistador de formas y ángulos">
+                        <i class="fa-solid fa-shapes"></i>
+                        <span>Geometría</span>
+                    </div>
+                    <div class="badge-item locked" data-badge="5" title="Medidas: Señor del tiempo y el espacio">
+                        <i class="fa-solid fa-ruler-combined"></i>
+                        <span>Medidas</span>
+                    </div>
+                    <div class="badge-item locked" data-badge="6" title="Problemas: Detective lógico">
+                        <i class="fa-solid fa-brain"></i>
+                        <span>Problemas</span>
+                    </div>
+                    <div class="badge-item locked" data-badge="7" title="Patrones: Descifrador de códigos">
+                        <i class="fa-solid fa-infinity"></i>
+                        <span>Patrones</span>
+                    </div>
+                    <div class="badge-item locked" data-badge="8" title="Estadística: Mago de los datos">
+                        <i class="fa-solid fa-chart-simple"></i>
+                        <span>Datos</span>
+                    </div>
+                </div>
+            </div>
+            <button class="reset-btn" id="reset-progress">
+                <i class="fa-solid fa-rotate-left"></i> Reiniciar Progreso
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main>
+
+        <!-- SECTION 1: INICIO (HERO) -->
+        <section id="inicio" class="hero-section scroll-reveal">
+            <div class="hero-container">
+                <div class="hero-content">
+                    <span class="hero-tagline"><i class="fa-solid fa-award"></i> 5.° Grado • Ministerio de Educación
+                        Pública</span>
+                    <h1 class="hero-title">Matemática <br><span class="gradient-text">Divertida</span></h1>
+                    <p class="hero-subtitle">Aprende matemáticas de quinto grado mediante juegos, retos y actividades
+                        interactivas diseñadas especialmente para ti.</p>
+                    <div class="hero-buttons">
+                        <a href="#actividades" class="btn btn-primary btn-lg">
+                            <span>Comenzar a aprender</span> <i class="fa-solid fa-arrow-right"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="hero-image-container">
+                    <img src="assets/hero_math_illustration.jpg" alt="Ilustración de matemáticas y tecnología"
+                        class="hero-image">
+                    <div class="floating-bubble bubble-1"><i class="fa-solid fa-plus"></i></div>
+                    <div class="floating-bubble bubble-2"><i class="fa-solid fa-divide"></i></div>
+                    <div class="floating-bubble bubble-3"><i class="fa-solid fa-percent"></i></div>
+                </div>
+            </div>
+
+            <!-- Tarjetas de Estadísticas Animadas -->
+            <div class="hero-stats-container">
+                <div class="stat-card" data-stat-target="8">
+                    <div class="stat-icon"><i class="fa-solid fa-graduation-cap"></i></div>
+                    <div class="stat-number-wrapper"><span class="stat-number">0</span></div>
+                    <p class="stat-label">Temas disponibles</p>
+                </div>
+                <div class="stat-card" data-stat-target="8">
+                    <div class="stat-icon"><i class="fa-solid fa-gamepad"></i></div>
+                    <div class="stat-number-wrapper"><span class="stat-number">0</span></div>
+                    <p class="stat-label">Actividades interactivas</p>
+                </div>
+                <div class="stat-card" data-stat-target="8">
+                    <div class="stat-icon"><i class="fa-solid fa-puzzle-piece"></i></div>
+                    <div class="stat-number-wrapper"><span class="stat-number">0</span></div>
+                    <p class="stat-label">Juegos educativos</p>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- SECTION 2: ACTIVIDADES EDUCATIVAS -->
+        <section id="actividades" class="section activities-section scroll-reveal">
+            <div class="section-header">
+                <span class="section-tag">Aprende Jugando</span>
+                <h2 class="section-title">Temas y Actividades</h2>
+                <p class="section-description">Explora los temas clave del plan de estudios del MEP para Quinto Grado y
+                    pon a prueba tus conocimientos en nuestros minijuegos interactivos.</p>
+            </div>
+
+            <div class="activities-grid">
+                <!-- Tarjeta 1 -->
+                <div class="activity-card card-purple" data-activity-id="1">
+                    <div class="activity-card-banner">
+                        <i class="fa-solid fa-calculator card-banner-icon"></i>
+                        <span class="activity-level">Nivel: Básico</span>
+                    </div>
+                    <div class="activity-card-content">
+                        <span class="activity-category">Números y Operaciones</span>
+                        <h3 class="activity-title">Números Naturales y Operaciones</h3>
+                        <p class="activity-desc">Domina las operaciones combinadas, prioridades de cálculo y orden de
+                            resolución de operaciones.</p>
+                        <button class="btn btn-card start-activity-btn">Iniciar actividad</button>
+                    </div>
+                </div>
+                <!-- Tarjeta 2 -->
+                <div class="activity-card card-blue" data-activity-id="2">
+                    <div class="activity-card-banner">
+                        <i class="fa-solid fa-xmark card-banner-icon"></i>
+                        <span class="activity-level">Nivel: Básico</span>
+                    </div>
+                    <div class="activity-card-content">
+                        <span class="activity-category">Cálculo Mental</span>
+                        <h3 class="activity-title">Multiplicación y División</h3>
+                        <p class="activity-desc">Agiliza tu mente estimando productos y resolviendo divisiones rápidas
+                            en escenarios lúdicos.</p>
+                        <button class="btn btn-card start-activity-btn">Iniciar actividad</button>
+                    </div>
+                </div>
+                <!-- Tarjeta 3 -->
+                <div class="activity-card card-teal" data-activity-id="3">
+                    <div class="activity-card-banner">
+                        <i class="fa-solid fa-pizza-slice card-banner-icon"></i>
+                        <span class="activity-level">Nivel: Intermedio</span>
+                    </div>
+                    <div class="activity-card-content">
+                        <span class="activity-category">Números y Fracciones</span>
+                        <h3 class="activity-title">Fracciones</h3>
+                        <p class="activity-desc">Diferencia entre fracciones propias, impropias y mixtas. Aprende a
+                            sumarlas y restarlas con facilidad.</p>
+                        <button class="btn btn-card start-activity-btn">Iniciar actividad</button>
+                    </div>
+                </div>
+                <!-- Tarjeta 4 -->
+                <div class="activity-card card-indigo" data-activity-id="4">
+                    <div class="activity-card-banner">
+                        <i class="fa-solid fa-shapes card-banner-icon"></i>
+                        <span class="activity-level">Nivel: Intermedio</span>
+                    </div>
+                    <div class="activity-card-content">
+                        <span class="activity-category">Formas Espaciales</span>
+                        <h3 class="activity-title">Geometría</h3>
+                        <p class="activity-desc">Explora el mundo de los ángulos (agudos, rectos, obtusos), la simetría
+                            y la clasificación de triángulos.</p>
+                        <button class="btn btn-card start-activity-btn">Iniciar actividad</button>
+                    </div>
+                </div>
+                <!-- Tarjeta 5 -->
+                <div class="activity-card card-orange" data-activity-id="5">
+                    <div class="activity-card-banner">
+                        <i class="fa-solid fa-ruler-combined card-banner-icon"></i>
+                        <span class="activity-level">Nivel: Intermedio</span>
+                    </div>
+                    <div class="activity-card-content">
+                        <span class="activity-category">Medidas e Instrumentos</span>
+                        <h3 class="activity-title">Medidas</h3>
+                        <p class="activity-desc">Aprende a realizar conversiones fluidas de longitud, masa, capacidad y
+                            tiempo.</p>
+                        <button class="btn btn-card start-activity-btn">Iniciar actividad</button>
+                    </div>
+                </div>
+                <!-- Tarjeta 6 -->
+                <div class="activity-card card-pink" data-activity-id="6">
+                    <div class="activity-card-banner">
+                        <i class="fa-solid fa-brain card-banner-icon"></i>
+                        <span class="activity-level">Nivel: Avanzado</span>
+                    </div>
+                    <div class="activity-card-content">
+                        <span class="activity-category">Resolución Lógica</span>
+                        <h3 class="activity-title">Resolución de Problemas</h3>
+                        <p class="activity-desc">Aplica tus destrezas matemáticas para resolver retos de la vida real
+                            analizando enunciados paso a paso.</p>
+                        <button class="btn btn-card start-activity-btn">Iniciar actividad</button>
+                    </div>
+                </div>
+                <!-- Tarjeta 7 -->
+                <div class="activity-card card-violet" data-activity-id="7">
+                    <div class="activity-card-banner">
+                        <i class="fa-solid fa-infinity card-banner-icon"></i>
+                        <span class="activity-level">Nivel: Avanzado</span>
+                    </div>
+                    <div class="activity-card-content">
+                        <span class="activity-category">Patrones Numéricos</span>
+                        <h3 class="activity-title">Patrones y Relaciones</h3>
+                        <p class="activity-desc">Descubre las reglas secretas en las sucesiones numéricas y completa las
+                            secuencias lógicas.</p>
+                        <button class="btn btn-card start-activity-btn">Iniciar actividad</button>
+                    </div>
+                </div>
+                <!-- Tarjeta 8 -->
+                <div class="activity-card card-green" data-activity-id="8">
+                    <div class="activity-card-banner">
+                        <i class="fa-solid fa-chart-simple card-banner-icon"></i>
+                        <span class="activity-level">Nivel: Básico</span>
+                    </div>
+                    <div class="activity-card-content">
+                        <span class="activity-category">Análisis de Datos</span>
+                        <h3 class="activity-title">Estadística Básica</h3>
+                        <p class="activity-desc">Interpreta gráficos de barras o líneas y determina la moda y el
+                            promedio de encuestas escolares.</p>
+                        <button class="btn btn-card start-activity-btn">Iniciar actividad</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+
+        <!-- SECTION 4: BITÁCORA DEL PROYECTO (TIMELINE) -->
+        <section id="bitacora" class="timeline-section scroll-reveal">
+            <div class="timeline-bg-decor"></div>
+            <div class="section-header text-white">
+                <span class="section-tag bg-glass">Desarrollo Paso a Paso</span>
+                <h2 class="section-title text-white">Bitácora del Desarrollo</h2>
+                <p class="section-description text-white-mute">Acompaña la historia de diseño, planificación y
+                    programación de esta plataforma educativa a través de un recorrido de 14 semanas.</p>
+            </div>
+
+            <!-- Línea de Tiempo del Desarrollo -->
+            <div class="timeline-container">
+                <div class="timeline-line"></div>
+
+                <!-- Semana 1 -->
+                <div class="timeline-item">
+                    <div class="timeline-dot"><i class="fa-solid fa-magnifying-glass"></i></div>
+                    <div class="timeline-card">
+                        <span class="timeline-week">Semana 1</span>
+                        <h3 class="timeline-title">Investigación de Requisitos</h3>
+                        <p class="timeline-short">Análisis de los programas oficiales del MEP de Costa Rica para
+                            Matemáticas de 5.° Grado y selección de los temas centrales.</p>
+                        <div class="timeline-expanded">
+                            <p>Durante esta semana inicial, nos sumergimos en la currícula oficial de Educación General
+                                Básica del MEP. Definimos los 8 temas clave y estudiamos los problemas metodológicos más
+                                comunes de aprendizaje en primaria.</p>
+                            <span class="timeline-tag">Etapa: Investigación</span>
+                        </div>
+                        <button class="btn btn-timeline-toggle">Expandir información <i
+                                class="fa-solid fa-chevron-down"></i></button>
+                    </div>
+                </div>
+
+                <!-- Semana 2 -->
+                <div class="timeline-item">
+                    <div class="timeline-dot"><i class="fa-solid fa-map"></i></div>
+                    <div class="timeline-card">
+                        <span class="timeline-week">Semana 2</span>
+                        <h3 class="timeline-title">Planificación del Proyecto</h3>
+                        <p class="timeline-short">Definición de los minijuegos didácticos para cada tema y
+                            estructuración del cronograma tecnológico.</p>
+                        <div class="timeline-expanded">
+                            <p>Esbozamos los objetivos de aprendizaje de cada actividad y seleccionamos mecánicas de
+                                juego acordes a la edad (arrastrar operadores, memorama, lógica de secuencia). Creamos
+                                el mapa de navegación del sitio.</p>
+                            <span class="timeline-tag">Etapa: Planificación</span>
+                        </div>
+                        <button class="btn btn-timeline-toggle">Expandir información <i
+                                class="fa-solid fa-chevron-down"></i></button>
+                    </div>
+                </div>
+
+                <!-- Semana 3 -->
+                <div class="timeline-item">
+                    <div class="timeline-dot"><i class="fa-solid fa-palette"></i></div>
+                    <div class="timeline-card">
+                        <span class="timeline-week">Semana 3</span>
+                        <h3 class="timeline-title">Diseño de la Interfaz</h3>
+                        <p class="timeline-short">Creación de la guía de estilo, selección de tipografías
+                            (Poppins/Inter) y definición de la paleta de colores premium.</p>
+                        <div class="timeline-expanded">
+                            <p>Elaboramos wireframes interactivos buscando un balance entre lo infantil-lúdico (colores
+                                vibrantes) y lo premium-corporativo (estilo minimalista con mucho espacio, sombras
+                                suaves y degradados sofisticados).</p>
+                            <span class="timeline-tag">Etapa: Diseño UX/UI</span>
+                        </div>
+                        <button class="btn btn-timeline-toggle">Expandir información <i
+                                class="fa-solid fa-chevron-down"></i></button>
+                    </div>
+                </div>
+
+                <!-- Semana 4 -->
+                <div class="timeline-item">
+                    <div class="timeline-dot"><i class="fa-solid fa-sitemap"></i></div>
+                    <div class="timeline-card">
+                        <span class="timeline-week">Semana 4</span>
+                        <h3 class="timeline-title">Organización del Contenido</h3>
+                        <p class="timeline-short">Estructuración pedagógica de las explicaciones matemáticas y selección
+                            de ejemplos para quinto grado.</p>
+                        <div class="timeline-expanded">
+                            <p>Redactamos explicaciones conceptuales fáciles de asimilar. Creamos curiosidades lúdicas e
+                                infografías y filtramos ejemplos ilustrativos paso a paso para cada uno de los ocho
+                                temas.</p>
+                            <span class="timeline-tag">Etapa: Contenido</span>
+                        </div>
+                        <button class="btn btn-timeline-toggle">Expandir información <i
+                                class="fa-solid fa-chevron-down"></i></button>
+                    </div>
+                </div>
+
+                <!-- Semana 5 -->
+                <div class="timeline-item">
+                    <div class="timeline-dot"><i class="fa-solid fa-code"></i></div>
+                    <div class="timeline-card">
+                        <span class="timeline-week">Semana 5</span>
+                        <h3 class="timeline-title">Desarrollo Base (Front-End)</h3>
+                        <p class="timeline-short">Creación del marcado semántico HTML5 y la arquitectura de CSS modular.
+                        </p>
+                        <div class="timeline-expanded">
+                            <p>Construimos el esqueleto del portal. Implementamos la barra de navegación fija y el Hero
+                                principal responsivo. Integramos los contenedores para el grid de actividades.</p>
+                            <span class="timeline-tag">Etapa: Código</span>
+                        </div>
+                        <button class="btn btn-timeline-toggle">Expandir información <i
+                                class="fa-solid fa-chevron-down"></i></button>
+                    </div>
+                </div>
+
+                <!-- Semana 6 -->
+                <div class="timeline-item">
+                    <div class="timeline-dot"><i class="fa-solid fa-wand-magic-sparkles"></i></div>
+                    <div class="timeline-card">
+                        <span class="timeline-week">Semana 6</span>
+                        <h3 class="timeline-title">Mejoras Visuales y Efectos</h3>
+                        <p class="timeline-short">Configuración de variables CSS, gradientes, bordes redondeados y
+                            efectos hover sofisticados.</p>
+                        <div class="timeline-expanded">
+                            <p>Aplicamos sombras suaves y efectos de elevación tridimensional 3D en las tarjetas.
+                                Diseñamos el estilo glassmorphic de las modales y el widget flotante de progreso.</p>
+                            <span class="timeline-tag">Etapa: Diseño UX/UI</span>
+                        </div>
+                        <button class="btn btn-timeline-toggle">Expandir información <i
+                                class="fa-solid fa-chevron-down"></i></button>
+                    </div>
+                </div>
+
+                <!-- Semana 7 -->
+                <div class="timeline-item">
+                    <div class="timeline-dot"><i class="fa-solid fa-trophy"></i></div>
+                    <div class="timeline-card">
+                        <span class="timeline-week">Semana 7</span>
+                        <h3 class="timeline-title">Sistema de Progreso Local</h3>
+                        <p class="timeline-short">Programación en JavaScript del panel de estadísticas y persistencia
+                            mediante localStorage.</p>
+                        <div class="timeline-expanded">
+                            <p>Establecimos la lógica para leer y escribir el progreso del usuario. El panel se
+                                sincroniza en tiempo real mostrando el conteo de actividades ganadas, medallas activas y
+                                la barra de porcentaje.</p>
+                            <span class="timeline-tag">Etapa: Lógica JS</span>
+                        </div>
+                        <button class="btn btn-timeline-toggle">Expandir información <i
+                                class="fa-solid fa-chevron-down"></i></button>
+                    </div>
+                </div>
+
+                <!-- Semana 8 -->
+                <div class="timeline-item">
+                    <div class="timeline-dot"><i class="fa-solid fa-gamepad"></i></div>
+                    <div class="timeline-card">
+                        <span class="timeline-week">Semana 8</span>
+                        <h3 class="timeline-title">Desarrollo de Actividades 1 a 4</h3>
+                        <p class="timeline-short">Construcción de los minijuegos interactivos de Operaciones Combinadas,
+                            Cálculo Mental, Fracciones y Geometría.</p>
+                        <div class="timeline-expanded">
+                            <p>Desarrollamos los primeros 4 juegos interactivos. Diseñamos e implementamos controles
+                                adaptados para dispositivos móviles y de escritorio (pantalla táctil y clics de ratón).
+                            </p>
+                            <span class="timeline-tag">Etapa: Código Juegos</span>
+                        </div>
+                        <button class="btn btn-timeline-toggle">Expandir información <i
+                                class="fa-solid fa-chevron-down"></i></button>
+                    </div>
+                </div>
+
+                <!-- Semana 9 -->
+                <div class="timeline-item">
+                    <div class="timeline-dot"><i class="fa-solid fa-gamepad"></i></div>
+                    <div class="timeline-card">
+                        <span class="timeline-week">Semana 9</span>
+                        <h3 class="timeline-title">Desarrollo de Actividades 5 a 8</h3>
+                        <p class="timeline-short">Desarrollo de los minijuegos de Medidas, Problemas cotidianos,
+                            Sucesiones y Gráficos Estadísticos.</p>
+                        <div class="timeline-expanded">
+                            <p>Finalizamos el desarrollo de los 8 minijuegos interactivos. Destaca la inclusión de
+                                gráficos interactivos SVG de barra en el juego de estadística básica, manipulados
+                                dinámicamente mediante JS.</p>
+                            <span class="timeline-tag">Etapa: Código Juegos</span>
+                        </div>
+                        <button class="btn btn-timeline-toggle">Expandir información <i
+                                class="fa-solid fa-chevron-down"></i></button>
+                    </div>
+                </div>
+
+                <!-- Semana 10 -->
+                <div class="timeline-item">
+                    <div class="timeline-dot"><i class="fa-solid fa-photo-film"></i></div>
+                    <div class="timeline-card">
+                        <span class="timeline-week">Semana 10</span>
+                        <h3 class="timeline-title">Integración de Recursos Multimedia</h3>
+                        <p class="timeline-short">Inserción de videos instructivos didácticos externos y creación de
+                            recursos en la biblioteca digital.</p>
+                        <div class="timeline-expanded">
+                            <p>Embebimos reproductores de video adaptables con controles de reproducción fluidos.
+                                Creamos fichas visuales elegantes para la sección de biblioteca digital, integrando
+                                consejos rápidos de estudio.</p>
+                            <span class="timeline-tag">Etapa: Multimedia</span>
+                        </div>
+                        <button class="btn btn-timeline-toggle">Expandir información <i
+                                class="fa-solid fa-chevron-down"></i></button>
+                    </div>
+                </div>
+
+                <!-- Semana 11 -->
+                <div class="timeline-item">
+                    <div class="timeline-dot"><i class="fa-solid fa-bolt"></i></div>
+                    <div class="timeline-card">
+                        <span class="timeline-week">Semana 11</span>
+                        <h3 class="timeline-title">Optimización y Animaciones</h3>
+                        <p class="timeline-short">Implementación del efecto de confeti, Scroll Reveal, contadores de
+                            carga numéricos y transiciones fluidas.</p>
+                        <div class="timeline-expanded">
+                            <p>Añadimos un motor liviano de confeti basado en HTML5 Canvas para celebrar cuando el
+                                estudiante resuelve correctamente un reto. Integramos Scroll Reveal para dar dinamismo a
+                                las secciones al navegar.</p>
+                            <span class="timeline-tag">Etapa: Animaciones</span>
+                        </div>
+                        <button class="btn btn-timeline-toggle">Expandir información <i
+                                class="fa-solid fa-chevron-down"></i></button>
+                    </div>
+                </div>
+
+                <!-- Semana 12 -->
+                <div class="timeline-item">
+                    <div class="timeline-dot"><i class="fa-solid fa-bug-slash"></i></div>
+                    <div class="timeline-card">
+                        <span class="timeline-week">Semana 12</span>
+                        <h3 class="timeline-title">Corrección de Errores</h3>
+                        <p class="timeline-short">Auditoría de bugs en juegos interactivas, detección de problemas
+                            lógicos de puntajes e insignias.</p>
+                        <div class="timeline-expanded">
+                            <p>Solucionamos fallas lógicas donde se duplicaba la puntuación si se repetía la actividad
+                                repetidamente. Limpiamos la consola del navegador eliminando advertencias y mejoramos el
+                                tiempo de carga del DOM.</p>
+                            <span class="timeline-tag">Etapa: Pruebas</span>
+                        </div>
+                        <button class="btn btn-timeline-toggle">Expandir información <i
+                                class="fa-solid fa-chevron-down"></i></button>
+                    </div>
+                </div>
+
+                <!-- Semana 13 -->
+                <div class="timeline-item">
+                    <div class="timeline-dot"><i class="fa-solid fa-mobile-screen-button"></i></div>
+                    <div class="timeline-card">
+                        <span class="timeline-week">Semana 13</span>
+                        <h3 class="timeline-title">Pruebas en Dispositivos Móviles</h3>
+                        <p class="timeline-short">Ajustes finales de adaptabilidad responsiva y controles táctiles para
+                            teléfonos y tabletas.</p>
+                        <div class="timeline-expanded">
+                            <p>Ajustamos los tamaños de los botones para cumplir con la pauta de accesibilidad en
+                                pantallas táctiles (mínimo 48px). Aseguramos que el drawer lateral de progreso sea 100%
+                                interactivo en pantallas móviles pequeñas.</p>
+                            <span class="timeline-tag">Etapa: Ajustes Móviles</span>
+                        </div>
+                        <button class="btn btn-timeline-toggle">Expandir información <i
+                                class="fa-solid fa-chevron-down"></i></button>
+                    </div>
+                </div>
+
+                <!-- Semana 14 -->
+                <div class="timeline-item">
+                    <div class="timeline-dot"><i class="fa-solid fa-circle-check"></i></div>
+                    <div class="timeline-card">
+                        <span class="timeline-week">Semana 14</span>
+                        <h3 class="timeline-title">Ajustes Finales</h3>
+                        <p class="timeline-short">Verificación final de diseño y preparación del lanzamiento de la
+                            plataforma educativa.</p>
+                        <div class="timeline-expanded">
+                            <p>Últimos toques visuales de contraste y accesibilidad. Empaquetado completo del código
+                                fuente limpio y bien comentado para su entrega y despliegue final como herramienta de
+                                aprendizaje real.</p>
+                            <span class="timeline-tag">Etapa: Entrega</span>
+                        </div>
+                        <button class="btn btn-timeline-toggle">Expandir información <i
+                                class="fa-solid fa-chevron-down"></i></button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 5: GALERÍA DE IMÁGENES -->
+        <section id="galeria" class="section gallery-section scroll-reveal">
+            <div class="section-header">
+                <span class="section-tag">Capturas y Recursos</span>
+                <h2 class="section-title">Galería del Proyecto</h2>
+                <p class="section-description">Explora el entorno visual, las medallas de logro y los materiales
+                    didácticos creados para esta plataforma.</p>
+            </div>
+
+            <div class="gallery-grid">
+                <div class="gallery-card">
+                    <div class="gallery-img-container">
+                        <img src="assets/gallery_numbers.jpg" alt="Números y operaciones combinadas">
+                        <div class="gallery-overlay">
+                            <span class="gallery-category">Operaciones</span>
+                            <h4>Aritmética Divertida</h4>
+                        </div>
+                    </div>
+                </div>
+                <div class="gallery-card">
+                    <div class="gallery-img-container">
+                        <img src="assets/gallery_geometry.jpg" alt="Figuras geométricas 3D">
+                        <div class="gallery-overlay">
+                            <span class="gallery-category">Geometría</span>
+                            <h4>Cuerpos y Formas</h4>
+                        </div>
+                    </div>
+                </div>
+                <div class="gallery-card">
+                    <div class="gallery-img-container">
+                        <img src="assets/gallery_fractions.jpg" alt="Pizza de fracciones">
+                        <div class="gallery-overlay">
+                            <span class="gallery-category">Fracciones</span>
+                            <h4>Partes del Entero</h4>
+                        </div>
+                    </div>
+                </div>
+                <div class="gallery-card">
+                    <div class="gallery-img-container">
+                        <img src="assets/gallery_measures.jpg" alt="Medidas y herramientas">
+                        <div class="gallery-overlay">
+                            <span class="gallery-category">Medidas</span>
+                            <h4>Tiempo y Masa</h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 6: ACERCA DEL PROYECTO -->
+        <section id="acerca" class="section about-section scroll-reveal">
+            <div class="about-container">
+                <div class="about-info">
+                    <span class="section-tag">Sobre la Iniciativa</span>
+                    <h2 class="section-title">Acerca del Proyecto</h2>
+                    <p class="about-text">
+                        <strong>Matemática Divertida</strong> es una plataforma de aprendizaje innovadora diseñada
+                        específicamente para estudiantes de quinto grado de la educación general costarricense. Su
+                        desarrollo está alineado estrechamente con el plan de estudios oficial del <strong>Ministerio de
+                            Educación Pública (MEP)</strong>.
+                    </p>
+                    <p class="about-text">
+                        Esta plataforma fue diseñada para fortalecer el aprendizaje de las Matemáticas de Quinto Grado
+                        mediante actividades lúdicas, recursos multimedia y experiencias interactivas. A través de la
+                        gamificación —ganando puntos y coleccionando medallas virtuales— fomentamos una mentalidad de
+                        crecimiento, eliminando la frustración y convirtiendo la matemática en una aventura interactiva
+                        para realizar en la escuela o el hogar.
+                    </p>
+                </div>
+                <div class="about-features">
+                    <div class="about-feature-item">
+                        <div class="about-feature-icon"><i class="fa-solid fa-award"></i></div>
+                        <div>
+                            <h4>Currículo del MEP</h4>
+                            <p>Temas 100% basados en los contenidos obligatorios del programa oficial de primaria
+                                costarricense.</p>
+                        </div>
+                    </div>
+                    <div class="about-feature-item">
+                        <div class="about-feature-icon"><i class="fa-solid fa-circle-check"></i></div>
+                        <div>
+                            <h4>Interactividad Táctil</h4>
+                            <p>Desarrollada para deslizar, arrastrar y presionar con fluidez en computadoras, iPads y
+                                smartphones (iOS y Android).</p>
+                        </div>
+                    </div>
+                    <div class="about-feature-item">
+                        <div class="about-feature-icon"><i class="fa-solid fa-star"></i></div>
+                        <div>
+                            <h4>Gamificación del Progreso</h4>
+                            <p>Feedback positivo, insignias coleccionables y control total de logros sin estrés de
+                                calificación tradicional.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Ventana Modal de Actividades / Juegos (Única y Dinámica) -->
+    <div class="modal-overlay" id="activity-modal">
+        <div class="modal-window">
+            <header class="modal-header">
+                <div class="modal-header-info">
+                    <span class="modal-category" id="modal-theme-category">Categoría</span>
+                    <h2 class="modal-title" id="modal-theme-title">Título del Tema</h2>
+                </div>
+                <button class="modal-close" id="modal-close" aria-label="Cerrar ventana">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </header>
+
+            <div class="modal-body">
+                <!-- Pestañas de Navegación dentro de la Modal -->
+                <div class="modal-tabs">
+                    <button class="modal-tab active" data-tab="explicacion"><i class="fa-solid fa-book-open"></i>
+                        Explicación</button>
+                    <button class="modal-tab" data-tab="juego"><i class="fa-solid fa-gamepad"></i> ¡A jugar!</button>
+                </div>
+
+                <!-- Pestaña 1: Explicación -->
+                <div class="modal-tab-content active" id="tab-explicacion">
+                    <div class="modal-theory-layout">
+                        <div class="theory-text">
+                            <h3>Aprende Fácil</h3>
+                            <div id="modal-explanation-text">
+                                Explicación teórica amigable.
+                            </div>
+
+                            <div class="curiosity-box">
+                                <h4><i class="fa-solid fa-face-smile-beam"></i> ¿Sabías qué?</h4>
+                                <p id="modal-curiosity-text">Dato curioso relacionado con el tema.</p>
+                            </div>
+                        </div>
+                        <div class="theory-media">
+                            <div class="modal-image-container" id="modal-image-container">
+                                <img id="modal-theme-image" src="" alt="Ilustración del tema" class="modal-theme-img">
+                            </div>
+                            <div class="video-container" id="modal-video-container">
+                                <iframe id="modal-video-iframe" src="" title="Video educativo" frameborder="0"
+                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                                    allowfullscreen class="resource-iframe"></iframe>
+                            </div>
+                            <div class="example-box">
+                                <h4><i class="fa-solid fa-lightbulb"></i> Ejemplo Resuelto</h4>
+                                <div id="modal-example-text">Ejemplo práctico resuelto paso a paso.</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pestaña 2: Área del Juego -->
+                <div class="modal-tab-content" id="tab-juego">
+                    <div class="game-instructions" id="game-instructions">
+                        Resuelve el siguiente reto interactivo para ganar <strong>20 puntos</strong> y desbloquear tu
+                        medalla.
+                    </div>
+                    <div class="game-canvas-area" id="game-canvas-area">
+                        <!-- El juego interactivo de JS se inyectará aquí de manera dinámica -->
+                    </div>
+
+                    <!-- Feedback y Botones del Juego -->
+                    <div class="game-feedback-container hidden" id="game-feedback-container">
+                        <div class="game-feedback-content">
+                            <div class="feedback-badge-animation" id="feedback-badge-anim">
+                                <i class="fa-solid fa-medal"></i>
+                            </div>
+                            <h3 id="feedback-title">¡Excelente Trabajo!</h3>
+                            <p id="feedback-message">Has completado esta actividad con éxito.</p>
+                            <div class="feedback-points">+20 Puntos</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-brand">
+                <a href="#" class="logo">
+                    <i class="fa-solid fa-graduation-cap logo-icon"></i>
+                    <span class="logo-text">Matemática<span>Divertida</span></span>
+                </a>
+                <p class="footer-desc">Desarrollando la educación de quinto grado a través del juego, alineado a los
+                    programas oficiales del MEP de Costa Rica.</p>
+            </div>
+            <div class="footer-links">
+                <h4>Enlaces Rápidos</h4>
+                <a href="#inicio">Inicio</a>
+                <a href="#actividades">Actividades</a>
+                <a href="#bitacora">Agenda</a>
+                <a href="#acerca">Acerca del Proyecto</a>
+            </div>
+            <div class="footer-credits">
+                <h4>Proyecto Educativo</h4>
+                <p><strong>Autor:</strong> ELI CHAVARRIA DUARTE</p>
+                <p><strong>Curso:</strong> Creatividad y talento</p>
+                <p><strong>Año:</strong> 2026</p>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 Matemática Divertida. Creado por ELI CHAVARRIA DUARTE con fines didácticos en colaboración
+                con el Ministerio de Educación Pública.</p>
+            <div class="footer-socials">
+                <a href="#" aria-label="Facebook"><i class="fa-brands fa-facebook"></i></a>
+                <a href="#" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
+                <a href="#" aria-label="YouTube"><i class="fa-brands fa-youtube"></i></a>
+                <a href="#" aria-label="Twitter"><i class="fa-brands fa-twitter"></i></a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Script de aplicación -->
+    <script src="app.js"></script>
+</body>
+
+</html>
